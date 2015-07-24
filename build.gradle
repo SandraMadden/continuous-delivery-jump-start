@@ -5,6 +5,7 @@ buildscript {
 
     dependencies {
         classpath 'com.bmuschko:gradle-tomcat-plugin:2.2.2'
+		classpath 'org.hidetake:gradle-ssh-plugin:0.4.5'
     }
 }
 
@@ -12,7 +13,15 @@ apply plugin: 'war'
 apply plugin: 'idea'
 apply plugin: 'com.bmuschko.tomcat'
 
+apply from: "$rootDir/gradle/unit-test.gradle"
+apply from: "$rootDir/gradle/integration-test.gradle"
+apply from: "$rootDir/gradle/code-quality.gradle"
+apply from: "$rootDir/gradle/code-coverage.gradle"
+apply from: "$rootDir/gradle/vagrant.gradle"
+
 group = 'org.gradle.training'
+
+version = new ProjectVersion(1, 2, new Date().format('HHmmss').toString())
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
@@ -32,6 +41,7 @@ dependencies {
     testCompile 'junit:junit:4.11'
     testCompile 'org.mockito:mockito-all:1.10.8'
 
+
     def tomcatVersion = '7.0.62'
     tomcat "org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}",
            "org.apache.tomcat.embed:tomcat-embed-logging-juli:${tomcatVersion}",
@@ -40,4 +50,31 @@ dependencies {
 
 tomcat {
     contextPath = 'sample-app'
+	httpPort = 9090
+}
+
+task printVersion {
+    doLast {
+        println "Project version: $project.version"
+    }
+}
+
+import groovy.transform.TupleConstructor
+
+@TupleConstructor
+class ProjectVersion {
+    final Integer major
+    final Integer minor
+    final String build
+
+    @Override
+    String toString() {
+        String fullVersion = "$major.$minor"
+
+        if(build) {
+            fullVersion += ".$build"
+        }
+
+        fullVersion
+    }
 }

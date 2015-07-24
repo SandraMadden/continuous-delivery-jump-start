@@ -1,0 +1,49 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+		classpath 'org.hidetake:gradle-ssh-plugin:0.4.5'
+    }
+}
+
+apply plugin: 'org.hidetake.ssh'
+//apply plugin: 'org.hidetake.ssh.plugin.SshPlugin'
+
+
+
+remotes {
+  webServer {
+    host = '192.168.10.33'
+//    user = 'tomcat'
+//    identity = file('id_rsa')
+	user = "vagrant"
+	password = "vagrant"
+  }
+}
+
+task deploy {
+  doLast {
+  
+	ssh.settings {
+		knownHosts = allowAnyHosts
+	}  
+  
+    ssh.run {
+	
+		Task warTask = project.tasks.getByName('war')
+		File webAppArtifactPath = warTask.archivePath
+		String webAppArtifactName = warTask.archiveName
+		
+		session(remotes.webServer) {
+				execute 'sudo service tomcat7 stop'
+                put webAppArtifactPath, '/tmp'
+                execute "sudo mv /tmp/$webAppArtifactName /tmp/sample-app.war"
+                execute "sudo rm -rf /var/lib/tomcat7/webapps/sample-app"
+                execute "sudo mv /tmp/sample-app.war /var/lib/tomcat7/webapps"
+                execute 'sudo service tomcat7 start'
+		}
+    }
+  }
+}

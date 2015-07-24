@@ -1,0 +1,55 @@
+project.version = new ProjectVersion(1, 4, new Date().getTime().toString())
+
+
+def getTime() {
+    // def date = new Date()
+    // def timestamp = date.format('HHmmss')
+	
+    String timestamp = Long.toString(new Date().time)
+    return timestamp	
+}
+
+@groovy.transform.TupleConstructor
+class ProjectVersion {
+  final Integer major
+  final Integer minor
+  final String build
+
+  @Override
+  String toString() {
+    String fullVersion = "$major.$minor"
+
+    if(build) {
+      fullVersion += ".$build"
+    }
+
+    fullVersion
+  }
+}
+
+
+
+
+// version = new ProjectVersion(3, 5, new Date().getTime().toString())
+
+// public class ProjectVersion {
+	// private final major;
+	// private final minor;
+	// private final String patch;
+	
+	// public ProjectVersion(Integer major, Integer minor, String patch) {
+		// this.major = major;
+		// this.minor = minor;
+		// this.patch = patch;
+	// }
+	
+	// @Override
+	// public String toString() {
+		// StringBuilder fullVersion = new StringBuilder();
+		// fullVersion.append(major
+	
+	// }
+// }
+
+
+
